@@ -64,23 +64,29 @@ class CreateOperation : NSOperation {
     
     var pkA : String?
     var pkB : String?
+    var pkBB : String?
     
     override func main() {
         try! realm.write {
             let objectA = ModelA()
             let objectB = ModelB()
+            let objectBB = ModelB()
             
             pkA = randomStringWithLength(10)
             pkB = randomStringWithLength(10)
+            pkBB =  randomStringWithLength(10)
             
             objectA.pk = pkA
             objectB.pk = pkB
+            objectBB.pk = pkBB
             
             objectA.data = randomStringWithLength(50)
             objectB.data = randomStringWithLength(50)
+            objectBB.data = randomStringWithLength(50)
             
             realm.add(objectA)
             realm.add(objectB)
+            realm.add(objectBB)
             
             NSLog("Writing objects")
         }
@@ -97,6 +103,7 @@ class RelationOperation: NSOperation {
     var sourceKeyValue = ""
     var targetClassName = ModelB.className()
     var targetKeyValue = ""
+    var targetKeyValue2 = ""
     
     var realm: Realm {
         get {
@@ -115,17 +122,18 @@ class RelationOperation: NSOperation {
     }
     
     override func main () {
-        let source = realm.dynamicObjectForPrimaryKey(sourceClassName, key: sourceKeyValue) // This line triggers the getter and causes the crash.
+        let source = realm.dynamicObjectForPrimaryKey(sourceClassName, key: sourceKeyValue)
         let target = realm.dynamicObjectForPrimaryKey(targetClassName, key: targetKeyValue)
+        let target2 =  realm.dynamicObjectForPrimaryKey(targetClassName, key: targetKeyValue2)
         NSLog("src: %@, target: %@", String(source), String(target))
         
-        if let source = source, target = target {
+        if let source = source, target = target, target2 = target2 {
             try! realm.write {
                 let list = source.dynamicList("objects")
+                list.append(target)
+                list.append(target2)
                 
-                if !list.contains(target) {
-                    list.append(target)
-                }
+                NSLog("Writing relation")
                 
                 source["objects"] = list
             }
@@ -189,6 +197,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let relationOperation = RelationOperation()
                 relationOperation.sourceKeyValue = createOperation.pkA!
                 relationOperation.targetKeyValue = createOperation.pkB!
+                relationOperation.targetKeyValue2 = createOperation.pkBB!
                 
                 relationOperation.addDependency(createOperation)
                 self.queue.addOperation(relationOperation)
