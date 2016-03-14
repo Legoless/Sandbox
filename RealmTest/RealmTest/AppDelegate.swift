@@ -27,6 +27,9 @@ func randomStringWithLength (len : Int) -> String {
 class ModelA: Object {
     dynamic var pk : String?
     dynamic var data : String?
+    
+    let objects = List<ModelB>()
+    
     override class func primaryKey() -> String? {
         return "pk"
     }
@@ -115,6 +118,18 @@ class RelationOperation: NSOperation {
         let source = realm.dynamicObjectForPrimaryKey(sourceClassName, key: sourceKeyValue) // This line triggers the getter and causes the crash.
         let target = realm.dynamicObjectForPrimaryKey(targetClassName, key: targetKeyValue)
         NSLog("src: %@, target: %@", String(source), String(target))
+        
+        if let source = source, target = target {
+            try! realm.write {
+                let list = source.dynamicList("objects")
+                
+                if !list.contains(target) {
+                    list.append(target)
+                }
+                
+                source["objects"] = list
+            }
+        }
     }
 }
 
