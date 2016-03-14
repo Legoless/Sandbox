@@ -166,7 +166,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {}*/
         
         //while (true) {
-        for _ in 0..<10000 {
+        for _ in 0..<arc4random_uniform(1000) {
             //let rand = arc4random_uniform(3)
             
             let createOperation = CreateOperation()
@@ -182,10 +182,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             queue.addOperation(createOperation)
         }
         
-        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), 4 * Int64(NSEC_PER_SEC))
+        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), Int64(Double(NSEC_PER_SEC) * 0.5))
         dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
             self.testRealm()
         }
+        
+        /*
+        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), 4 * Int64(NSEC_PER_SEC))
+        dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+            self.testRealm()
+        }*/
     }
 }
 
