@@ -45,10 +45,11 @@ class ViewController: UIViewController {
             }
         }
         
-        if objects.count >= objectsToTrackCount {
+        if objects.count >= 50 {
             for object in objects {
                 object.realm?.refresh()
                 NSLog("Object: %@", object)
+                //sleep(1)
             }
         }
         
