@@ -6,20 +6,45 @@
 //  Copyright © 2016 Unified Sense. All rights reserved.
 //
 
+import RealmSwift
 import UIKit
 
 class ViewController: UIViewController {
+    
+    let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var objects : [Object] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), Int64(Double(NSEC_PER_SEC) * 0.5))
+        dispatch_after(time, dispatch_get_main_queue()) {
+            self.fetchModel()
+        }
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func fetchModel () {
+        NSLog("Fetching models...")
+        
+        let realm = try! Realm()
+        realm.refresh()
+        
+        for _ in 0..<randomInt(20) {
+        
+            let randomReference = delegate.references[randomInt(delegate.references.count)]
+        
+            if let object = realm.dynamicObjectForPrimaryKey(randomReference.className, key: randomReference.pk) {
+                NSLog("Fetched model: [%@ : %@] Count: %d", randomReference.className, randomReference.pk, objects.count)
+                objects.append(object)
+            }
+        }
+        
+        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), Int64(Double(NSEC_PER_SEC) * 0.5))
+        dispatch_after(time, dispatch_get_main_queue()) {
+            self.fetchModel()
+        }
     }
-
 
 }
 
