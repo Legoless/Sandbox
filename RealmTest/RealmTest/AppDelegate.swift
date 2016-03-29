@@ -150,18 +150,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Pick a random object from pool and generate a relation
 
         var counter = 0
-        let count = Int(arc4random_uniform(UInt32(number)))
+        let count = Int(arc4random_uniform(UInt32(number * 8)))
         
-        let nonrelatedReferences = references.filter { $0.related == false }
-        
-        while counter < min(count, nonrelatedReferences.count) {
-            var nonrelatedReference = nonrelatedReferences[counter]
+        while counter < count && references.count > 0 {
+            let reference = references[counter % references.count]
             
-            if let relationOperation = relationForReference(nonrelatedReference, references: references) {
-                relationOperation.completionBlock = {
-                    nonrelatedReference.related = true
-                }
-                
+            if let relationOperation = relationForReference(reference, references: references) {
                 self.queue.addOperation(relationOperation)
             }
             

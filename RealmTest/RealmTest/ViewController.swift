@@ -13,7 +13,9 @@ class ViewController: UIViewController {
     
     let delegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var objects : [Object] = []
+    let objectsToTrackCount = 500
+    
+    var objects : [DynamicObject] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +38,17 @@ class ViewController: UIViewController {
         
             if let object = realm.dynamicObjectForPrimaryKey(randomReference.className, key: randomReference.pk) {
                 NSLog("Fetched model: [%@ : %@] Count: %d", randomReference.className, randomReference.pk, objects.count)
-                objects.append(object)
+                
+                if objects.count < objectsToTrackCount {
+                    objects.append(object)
+                }
+            }
+        }
+        
+        if objects.count >= objectsToTrackCount {
+            for object in objects {
+                object.realm?.refresh()
+                NSLog("Object: %@", object)
             }
         }
         
